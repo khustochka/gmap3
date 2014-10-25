@@ -101,19 +101,21 @@
    * @return {Boolean}
    */
   function googleVersionMin(version) {
-    var toInt = function(v){return parseInt(v, 10);},
-        // extract the google map version
-        gmVersion = google.maps.version.split(".").map(toInt),
-        i;
-    version = version.split(".").map(toInt);
+    var i,
+      gmVersion = google.maps.version.split(".");
+    version = version.split(".");
+    for(i = 0; i < gmVersion.length; i++) {
+      gmVersion[i] = parseInt(gmVersion[i], 10);
+    }
     for(i = 0; i < version.length; i++) {
-        if (gmVersion.hasOwnProperty(i)) {
-            if (gmVersion[i] < version[i]) {
-                return false;
-            }
-        } else {
-            return false;
+      version[i] = parseInt(version[i], 10);
+      if (gmVersion.hasOwnProperty(i)) {
+        if (gmVersion[i] < version[i]) {
+          return false;
         }
+      } else {
+        return false;
+      }
     }
     return true;
   }
@@ -371,6 +373,10 @@
     this.getPosition = function(){
         return latLng;
     };
+	this.setPosition = function(newLatLng){
+		latLng = newLatLng;
+		this.draw();
+	};
     this.draw = function() {
         var ps = this.getProjection().fromLatLngToDivPixel(latLng);
         $div
@@ -2164,12 +2170,14 @@
         $.each(args.todo.values, function(i, value){
           var todo = tuple(args, value);
           todo.options.position = todo.options.position ? toLatLng(todo.options.position) : toLatLng(value);
-          todo.options.map = map;
-          if (init){
-            map.setCenter(todo.options.position);
-            init = false;
+          if (todo.options.position) {
+            todo.options.map = map;
+            if (init){
+              map.setCenter(todo.options.position);
+              init = false;
+            }
+            internalClusterer.add(todo, value);
           }
-          internalClusterer.add(todo, value);
         });
 
         internalClusterer.endUpdate();
@@ -2180,15 +2188,17 @@
         $.each(args.todo.values, function(i, value){
           var id, obj, todo = tuple(args, value);
           todo.options.position = todo.options.position ? toLatLng(todo.options.position) : toLatLng(value);
-          todo.options.map = map;
-          if (init){
-            map.setCenter(todo.options.position);
-            init = false;
+          if (todo.options.position) {
+            todo.options.map = map;
+            if (init){
+              map.setCenter(todo.options.position);
+              init = false;
+            }
+            obj = new defaults.classes.Marker(todo.options);
+            objs.push(obj);
+            id = store.add({todo:todo}, "marker", obj);
+            attachEvents($this, {todo:todo}, obj, id);
           }
-          obj = new defaults.classes.Marker(todo.options);
-          objs.push(obj);
-          id = store.add({todo:todo}, "marker", obj);
-          attachEvents($this, {todo:todo}, obj, id);
         });
         manageEnd(args, multiple ? objs : objs[0]);
       }
