@@ -450,16 +450,17 @@ function InternalClusterer($container, map, raw) {
       }
 
       cluster = {indexes: [], ref: []};
-      lat = lng = 0;
+      lat = tds[keys[indexes[0]]].options.position.lat();
+      lng = tds[keys[indexes[0]]].options.position.lng();
       for (k = 0; k < indexes.length; k++) {
         used[indexes[k]] = true;
         cluster.indexes.push(keys[indexes[k]]);
         cluster.ref.push(keys[indexes[k]]);
-        lat += tds[keys[indexes[k]]].options.position.lat();
-        lng += tds[keys[indexes[k]]].options.position.lng();
+//        lat += tds[keys[indexes[k]]].options.position.lat();
+//        lng += tds[keys[indexes[k]]].options.position.lng();
       }
-      lat /= indexes.length;
-      lng /= indexes.length;
+//      lat /= indexes.length;
+//      lng /= indexes.length;
       cluster.latLng = new gm.LatLng(lat, lng);
 
       cluster.ref = cluster.ref.join("-");

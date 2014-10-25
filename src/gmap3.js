@@ -227,9 +227,10 @@ function Gmap3($this) {
 
         obj = self.overlay({td: atd, opts: atd.options, latLng: toLatLng(cluster)}, true);
 
-        atd.options.pane = "floatShadow";
-        atd.options.content = $(document.createElement("div")).width(style.width + "px").height(style.height + "px").css({cursor: "pointer"});
-        shadow = self.overlay({td: atd, opts: atd.options, latLng: toLatLng(cluster)}, true);
+        //atd.options.pane = "floatShadow";
+        //atd.options.content = $(document.createElement("div")).width(style.width + "px").height(style.height + "px").css({cursor: "pointer"});
+        shadow = {}; //self.overlay({td: atd, opts: atd.options, latLng: toLatLng(cluster)}, true);
+        // VK: we will attach events to the object itself, not the shadow. But shadow object should exist.
 
         // store data to the clusterer
         td.data = {
@@ -242,7 +243,7 @@ function Gmap3($this) {
             internalClusterer.marker(index).setMap(null);
           }
         });
-        attachEvents($this, {td: td}, shadow, undef, {main: obj, shadow: shadow});
+        attachEvents($this, {td: td}, obj, undef, {main: obj, shadow: shadow});
         internalClusterer.store(cluster, obj, shadow);
       } else {
         $.each(cluster.indexes, function (i, index) {

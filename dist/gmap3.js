@@ -1378,16 +1378,17 @@ function InternalClusterer($container, map, raw) {
       }
 
       cluster = {indexes: [], ref: []};
-      lat = lng = 0;
+      lat = tds[keys[indexes[0]]].options.position.lat();
+      lng = tds[keys[indexes[0]]].options.position.lng();
       for (k = 0; k < indexes.length; k++) {
         used[indexes[k]] = true;
         cluster.indexes.push(keys[indexes[k]]);
         cluster.ref.push(keys[indexes[k]]);
-        lat += tds[keys[indexes[k]]].options.position.lat();
-        lng += tds[keys[indexes[k]]].options.position.lng();
+//        lat += tds[keys[indexes[k]]].options.position.lat();
+//        lng += tds[keys[indexes[k]]].options.position.lng();
       }
-      lat /= indexes.length;
-      lng /= indexes.length;
+//      lat /= indexes.length;
+//      lng /= indexes.length;
       cluster.latLng = new gm.LatLng(lat, lng);
 
       cluster.ref = cluster.ref.join("-");
@@ -1409,6 +1410,7 @@ function InternalClusterer($container, map, raw) {
     redrawing = false;
   }
 }
+
 /**
  * Class Clusterer
  * a facade with limited method for external use
@@ -1770,9 +1772,10 @@ function Gmap3($this) {
 
         obj = self.overlay({td: atd, opts: atd.options, latLng: toLatLng(cluster)}, true);
 
-        atd.options.pane = "floatShadow";
-        atd.options.content = $(document.createElement("div")).width(style.width + "px").height(style.height + "px").css({cursor: "pointer"});
-        shadow = self.overlay({td: atd, opts: atd.options, latLng: toLatLng(cluster)}, true);
+        //atd.options.pane = "floatShadow";
+        //atd.options.content = $(document.createElement("div")).width(style.width + "px").height(style.height + "px").css({cursor: "pointer"});
+        shadow = {}; //self.overlay({td: atd, opts: atd.options, latLng: toLatLng(cluster)}, true);
+        // VK: we will attach events to the object itself, not the shadow. But shadow object should exist.
 
         // store data to the clusterer
         td.data = {
@@ -1785,7 +1788,7 @@ function Gmap3($this) {
             internalClusterer.marker(index).setMap(null);
           }
         });
-        attachEvents($this, {td: td}, shadow, undef, {main: obj, shadow: shadow});
+        attachEvents($this, {td: td}, obj, undef, {main: obj, shadow: shadow});
         internalClusterer.store(cluster, obj, shadow);
       } else {
         $.each(cluster.indexes, function (i, index) {
